@@ -6,9 +6,7 @@ Data: 22/04/2022
 
 Baseado no artigo: https://www.gosmar.eu/machinelearning/2020/05/25/neural-networks-and-speech-recognition/
 Adaptado para o Dataset: https://github.com/Jakobovski/free-spoken-digit-dataset
-Foram utilizados apenas as 300 primeiras amostras do dataset, correspondentes aos 6 locutores pronuciando o dígito "zero" em inglês.
-Os arquivos foram renomeados adicionando um dígito de 0 a 5 no início de cada arquivo, que servirá para identificar o locutor:
-Codificação: 0 = 'george', 1 = 'jackson', 2 = 'lucas', 3 = 'nicolas', 4 = 'theo', 5 = 'yweweler'
+Esse script é somente para plotar os gráficos de 12 amostras (2 de cada classe) e suas respectivas visualizações dos MFCC
 '''
 #início dos imports:
 import matplotlib.pyplot as plt
