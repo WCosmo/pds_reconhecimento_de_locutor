@@ -57,7 +57,7 @@ for i in soundfile:
     data.append(sig)
 
 na = len(data) #numero total de amostras
-s_max = 0 #variável para armazenar o maior tamonho do maior sinal do conjunto
+s_max = 0 #variável para armazenar o tamonho do maior sinal do conjunto
 
 for aa in range(na):
     if len(data[aa]) > s_max:
