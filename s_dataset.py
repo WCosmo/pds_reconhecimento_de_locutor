@@ -4,7 +4,7 @@ Projeto: reconhecimento de locutor
 Autores: Tatiane Balbinot, Wilson Cosmo
 Data: 05/05/2022
 
-Script com a finalidade de carregar uma porção específica do 'free' dataset
+Script com a finalidade de carregar uma porção específica do 'free spoken digit dataset' dataset
 Apenas as intâncias referentes à pronuncia de 'zero' foram carregadas e identificadas de 0 a 5 de acordo com a classe correspondente (locutor)
 '''
 import urllib.request
