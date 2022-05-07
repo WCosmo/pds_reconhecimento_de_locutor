@@ -9,6 +9,8 @@ Adaptado para o Dataset: https://github.com/Jakobovski/free-spoken-digit-dataset
 Foram utilizados apenas as 300 primeiras amostras do dataset, correspondentes aos 6 locutores pronuciando o dígito "zero" em inglês.
 Os arquivos foram renomeados adicionando um dígito de 0 a 5 no início de cada arquivo, que servirá para identificar o locutor:
 Codificação: 0 = 'george', 1 = 'jackson', 2 = 'lucas', 3 = 'nicolas', 4 = 'theo', 5 = 'yweweler'
+
+Essa versão do script utiliza Zero padding para que as instâncias tenham o mesmo tamanho no momento da análise.
 '''
 #início dos imports:
 import pandas as pd
@@ -16,7 +18,6 @@ from sklearn.model_selection import train_test_split
 import pickle
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-from IPython.display import HTML
 import numpy as np
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
@@ -32,6 +33,8 @@ from keras.layers import Dense, Flatten, Activation, Dropout, LSTM
 from keras.layers import Conv2D, MaxPooling2D, GlobalMaxPooling2D
 from keras.optimizers import gradient_descent_v2
 from scipy.interpolate import interp1d
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 #fim dos imports
 
 def rel(r): #função que associa o numero ao locutor correspondente
@@ -50,10 +53,10 @@ def rel(r): #função que associa o numero ao locutor correspondente
         n = 'yweweler'
     return n
 
-soundfile = os.listdir('./amostras') #lê os nomes dos arquivos de um subdiretório /amostras
+soundfile = os.listdir('./dataset') #lê os nomes dos arquivos de um subdiretório /amostras
 data=[] #variável para armazenar as amostras
 for i in soundfile:
-    (rate,sig) = wav.read('./amostras/'+i) #carrega as informações de cada arquivo .wav
+    (rate,sig) = wav.read('./dataset/'+i) #carrega as informações de cada arquivo .wav
     data.append(sig)
 
 na = len(data) #numero total de amostras
@@ -67,7 +70,7 @@ size = s_max #o tamanho da entrada será equivalente ao tamanho do maior sinal
 X=[] #variavel de armazenamento dos valores MFCC das amostras
 for i in range(na): #aquisição dos valores MFCC para cada amostra
     mfcc_feat = mfcc(data[i],rate,nfft=512)
-    mfcc_feat = np.resize(mfcc_feat, (size,13))
+    mfcc_feat = np.resize(mfcc_feat, (size,13)) #ao utilizar o tamanho da maior instância como referência, as instâncias menores irão gerar valores nulos após o final da instância original, no ponto de vista da matriz de MFCC
     X.append(mfcc_feat)
 X = np.array(X) #formatação de X no formato matriz np
 
@@ -116,7 +119,7 @@ val_accuracy = history_dict['val_accuracy'] #acurácia de validação ao longo d
 # Plot da Acurácia de Treinamento (-) e Validação (o)
 plt.plot(np.arange(epch), accuracy, linestyle = 'dotted', color = 'b', label='Training accuracy') #plot da acurácia de treinamento
 plt.plot(np.arange(epch), val_accuracy, 'o', color = 'r', label='Validation accuracy') #plot da acurácia de validação
-plt.title('Acurácia de Treinamento (-) e Validação (o)')
+plt.title('Acurácia de Treinamento (-) e Validação (o) - Zero padding')
 plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
 plt.xlabel('Épocas')
 plt.ylabel('Acurácia')
@@ -125,7 +128,7 @@ plt.show()
 # Plot da Erro de Treinamento (-) e Validação (o)
 plt.plot(np.arange(epch), loss_values, linestyle = 'dotted', color = 'b', label='Training loss') #plot do erro de treinamento
 plt.plot(np.arange(epch), val_loss_values, 'o', color = 'r', label='Validation loss') #plot do erro de validação
-plt.title('Erro de Treinamento (-) e Validação (o)')
+plt.title('Erro de Treinamento (-) e Validação (o) - Zero padding')
 plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
 plt.xlabel('Épocas')
 plt.ylabel('Erro')
@@ -133,20 +136,25 @@ plt.show()
 
 nn = np.arange(int(na*ts)) #vetor auxiliar para plotagem do gráfico de predição, representa o número de amostras do teste
 ny = np.arange(int(na*ts)) #vetor auxiliar para plotagem de gráfico de predição, representa os valores reais do dataset de treinamento
+nyy = np.arange(int(na*ts)) #vetor auxiliar para plotagem de gráfico de predição, representa os valores reais do dataset de treinamento
 for n1 in nn:
     max_index = np.argmax(y_test[n1])
     ny[n1] = max_index
-plt.plot(ny, linestyle = 'dotted', color = 'b') #os valores reais são plotados como uma linha azul pontilhada
 
 for n1 in nn:
     pred = model.predict(x_test[int(n1)].reshape(-1,size,13,1))
-    plt.plot(n1, pred.argmax(), 'o', color = 'r') #os valores previstos pela rede são representados no gráfico como pontos vermelhos
+    nyy[n1] = pred.argmax()
 
-plt.title("Comparação dos valores reais com os valores previstos")
-plt.xlabel("Número de amostras (conjunto de teste)")
-plt.ylabel("Valores reais (-) e Predições da rede (o)")
-plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-plt.show() #exibição do gráfico
+#Gerar a matriz de confusão
+cf_matrix = confusion_matrix(ny, nyy)
+ax = plt.subplots()
+ax = sns.heatmap(cf_matrix/np.sum(cf_matrix), annot=True, fmt='.2%', cmap='Blues')
+ax.set_title('Matriz de Confusão - Zero padding\n\n');
+ax.set_xlabel('\nValores Previstos')
+ax.set_ylabel('Valores Reais');
+ax.xaxis.set_ticklabels(['george','jackson','lucas','nicolas','theo','yweweler'])
+ax.yaxis.set_ticklabels(['george','jackson','lucas','nicolas','theo','yweweler'])
+plt.show()
 
 print('\n\n------------------------------------------------------------')
 print('Modo de teste manual')
