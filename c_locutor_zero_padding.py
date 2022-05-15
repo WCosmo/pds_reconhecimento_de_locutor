@@ -136,7 +136,7 @@ plt.show()
 
 nn = np.arange(int(na*ts)) #vetor auxiliar para plotagem do gráfico de predição, representa o número de amostras do teste
 ny = np.arange(int(na*ts)) #vetor auxiliar para plotagem de gráfico de predição, representa os valores reais do dataset de treinamento
-nyy = np.arange(int(na*ts)) #vetor auxiliar para plotagem de gráfico de predição, representa os valores reais do dataset de treinamento
+nyy = np.arange(int(na*ts)) #vetor auxiliar para plotagem de gráfico de predição, representa os valores previstos pelo algoritmo 
 for n1 in nn:
     max_index = np.argmax(y_test[n1])
     ny[n1] = max_index
