@@ -23,32 +23,32 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 #fim dos imports
 
-soundfile = os.listdir('./amostras') #lê os nomes dos arquivos de um subdiretório /amostras
-data=[] #variável para armazenar as amostras
+soundfile = os.listdir('./dataset') #lê os nomes dos arquivos de um subdiretório /dataset
+data=[] #variável para armazenar as instâncias
 for i in soundfile:
-    (rate,sig) = wav.read('./amostras/'+i) #carrega as informações de cada arquivo .wav
+    (rate,sig) = wav.read('./dataset/'+i) #carrega as informações de cada arquivo .wav
     data.append(sig)
 
-na = len(data) #numero total de amostras
+na = len(data) #numero total de instâncias
 nc = 6 #numero de classes
 tt = '' #variável para gerar o título dos gráficos
 for bb in range(nc*2):
-    plt.plot(data[bb*25]) #plotagem de 12 amostras
-    tt = 'Visualização da amostra número #' + str((bb*25)+1)
+    plt.plot(data[bb*25]) #plotagem de 12 instâncias
+    tt = 'Visualização da instância número #' + str((bb*25)+1)
     plt.title(tt)
     plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
     plt.show()
 
-X=[] #variavel de armazenamento dos valores MFCC das amostras
-for i in range(na): #aquisição dos valores MFCC para cada amostra
+X=[] #variavel de armazenamento dos valores MFCC das instâncias
+for i in range(na): #aquisição dos valores MFCC para cada instâncias
     mfcc_feat = mfcc(data[i],rate,nfft=512)
     X.append(mfcc_feat)
 X = np.array(X) #formatação de X no formato matriz np
 
-for bb in range(nc*2): #plotagem do mfcc de 12 amostras
+for bb in range(nc*2): #plotagem do mfcc de 12 instâncias
     ig, ax = plt.subplots()
     mfcc_data= np.swapaxes(X[bb*25], 0 ,1)
     cax = ax.imshow(mfcc_data, interpolation='nearest', cmap=cm.coolwarm, origin='lower', aspect='auto')
-    tt = 'Visualização dos MFCC da amostra número #' + str((bb*25)+1)
+    tt = 'Visualização dos MFCC da instância número #' + str((bb*25)+1)
     ax.set_title(tt)
     plt.show()
